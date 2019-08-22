@@ -43,7 +43,7 @@ public:
 		for(int i=0;i<v.size();i++){
 			vector<int> a;		string s1 = v.at(i);
 			for(int j=0;j<N;j++){
-				if(j<s1.size()){a.push_back(j);}
+				if(j<s1.size()){a.push_back(vcb[s1[j]]);}
 				else {a.insert(a.begin()+(rand()%a.size()),-1);}
 			}
 			w.push_back(a);
@@ -55,7 +55,9 @@ struct transtn{
 	int sid,p1,p2; 
 };
 
-unordered_map<string,int> mp;
+unordered_map<pair<int,int>,int> mp;
+
+unordered_map<char,int>	vcb;
 vector<string> k;	int cc;
 
 void print(st a){
@@ -71,13 +73,6 @@ void print(st a){
 	}
 }
 
-int cost(int i,int j, int a,int b){
-	string key="";
-	string s1 = k.at(i);		string s2 = k.at(j);
-	if(a==-1)key+="-";		else key+=s1[a];
-	if(b==-1)key+="-";		else key+=s2[b];
-	return mp[key];
-}
 
 int eval(st a){
 	int cst=0;
@@ -85,7 +80,7 @@ int eval(st a){
 	vector<std::vector<int>> v = a.w;
 	for(int i=0;i<v.size()-1;i++){
 		for(int j=i+1;j<v.size();j++){
-			for(int k=0;k<n;k++)cst+=(	cost(i,j,v.at(i).at(k),v.at(j).at(k))	);
+			for(int k=0;k<n;k++)cst+=(	mp[make_pair(v.at(i).at(k),v.at(j).at(k))] );
 		}
 		cst+=((n - k.at(i).size())*cc);
 	}
@@ -138,17 +133,17 @@ int main(){
 	time_t start, end;		
 	mp.clear();
 	float minutes;		cin >> minutes;		int sec = (int)(60* minutes);
-	int V;				cin >> V;			int v=V;							string grbg;				getline(cin,grbg);
-	string vcb;			getline(cin,vcb);	vector<char> voc;					for(int i=0;v>0;i+=3,v--)voc.push_back(vcb[i]);
+	int V;				cin >> V;			int v=V;					string grbg;				getline(cin,grbg);
+	string vc;			getline(cin,vc);	vector<char> voc;			for(int i=0;v>0;i+=3,v--)voc.push_back(vcb[i]);		
+	for(int i=0;i<voc.size();i++)vcb[voc.at(i)]=i;
 	int K;				cin >> K;
 	k.clear();			string s;			for(int i=0;i<K;i++){cin >> s;	k.push_back(s);}   
 	cc=0;				cin >> cc;			int e=0;	
 	for(int i=0;i<=V;i++){
 		for(int j=0;j<=V;j++){
-			cin >> e;	string s1="";
-			if(i<V)s1+=voc.at(i);		else s1+="-";
-			if(j<V)s1+=voc.at(j);		else s1+="-";	
-			mp[s1]=e;	
+			cin >> e;	int a1=i;	int a2=j;
+			if(i==V)a1=-1;	if(j==V)a2=-1;	
+			mp[make_pair(a1,a2)]=e;	
 		}
 	}	char c;				cin >> c;
 	
