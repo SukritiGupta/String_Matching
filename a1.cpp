@@ -111,6 +111,8 @@ searchspace findbest_forn(int don, int* val, time_t start)
 		{
 			int s= xorshf96()%K;
 			flag=false;
+			int besteval=10;
+			int p1b,p2b;
 			for (int j = 0; j < don; ++j)
 			{
 				time(&now);
@@ -133,17 +135,25 @@ searchspace findbest_forn(int don, int* val, time_t start)
 					}
 					if(diff1<diff2 && diff1<0)
 					{
-						a.w[s][j]=a.w[s][j-1];
-						a.w[s][j-1]=V;
-						curreval+=diff1;
+
 						flag=true;
+						if (diff1<besteval)
+						{
+							besteval=diff2;
+							p1b=j;
+							p2b=j-1;
+						}
 						// diffglobe++;
 					}
 					else if(diff2<diff1 && diff2<0)
 					{
-						a.w[s][j]=a.w[s][j+1];
-						a.w[s][j+1]=V;
-						curreval+=diff2;
+						if (diff2<besteval)
+						{
+							besteval=diff2;
+							p1b=j;
+							p2b=j+1;
+						}
+
 						flag=true;
 						// diffglobe++;
 					}
@@ -156,7 +166,12 @@ searchspace findbest_forn(int don, int* val, time_t start)
 				diffglobe++;
 			}
 			else
+			{
 				diffglobe=0;
+				a.w[s][p1b]=a.w[s][p2b];
+				a.w[s][p2b]=V;
+				curreval+=besteval;
+			}
 
 
 		}
