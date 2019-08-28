@@ -1,3 +1,4 @@
+	
 #include <bits/stdc++.h>
 
 static unsigned long x=123456789, y=362436069, z=521288629;
@@ -117,9 +118,9 @@ searchspace findbest_forn(int don, int* val, time_t start)
 						break;
 					diff1=100;
 					diff2=100;
-					if(a.w[i][j]==V+1)
+					if(a.w[i][j]==V)
 					{
-
+						// cout<<"here";
 						if(j>0)
 						{
 							if(a.w[i][j-1]!=V)
@@ -130,14 +131,14 @@ searchspace findbest_forn(int don, int* val, time_t start)
 							if(a.w[i][j+1]!=V)
 								diff2=eval(a,i,j,j+1);
 						}
-						if(diff1<diff2 && diff1<=0)
+						if(diff1<diff2 && diff1<0)
 						{
 							a.w[i][j]=a.w[i][j-1];
 							a.w[i][j-1]=V;
 							curreval+=diff1;
 							diffglobe++;
 						}
-						else if(diff2<diff1 && diff2<=0)
+						else if(diff2<diff1 && diff2<0)
 						{
 							a.w[i][j]=a.w[i][j+1];
 							a.w[i][j+1]=V;
@@ -197,7 +198,7 @@ int main()
 
 	cin>>K;
 
-	cout<<"**********"<<K;
+	// cout<<"**********"<<K;
 
 	vecstr.clear();			
 	string s;
@@ -217,7 +218,7 @@ int main()
 
 
 	cin>>CC;
-	cout<<"^^^^^^^^^^^^^^^^^^^^^"<<CC;
+	// cout<<"^^^^^^^^^^^^^^^^^^^^^"<<CC;
 
 	int temp;
 
