@@ -104,15 +104,14 @@ searchspace findbest_forn(int don, int* val, time_t start)
 		searchspace a= searchspace(don);
 		curreval=Totaleval(a)+ CC*(don*K-totNi);
 		diffglobe=5;
-		// cout<<don;
+		// cout<<don<<endl;
 		bool flag=false;
 		int temp=K;
-		while(diffglobe<temp)
+		int sm=0;
+		while(diffglobe<temp && sm<5)
 		{
 			int s= xorshf96()%K;
 			flag=false;
-			int besteval=10;
-			int p1b,p2b;
 			for (int j = 0; j < don; ++j)
 			{
 				time(&now);
@@ -135,27 +134,35 @@ searchspace findbest_forn(int don, int* val, time_t start)
 					}
 					if(diff1<diff2 && diff1<0)
 					{
-
+						a.w[s][j]=a.w[s][j-1];
+						a.w[s][j-1]=V;
+						curreval+=diff1;
 						flag=true;
-						if (diff1<besteval)
-						{
-							besteval=diff2;
-							p1b=j;
-							p2b=j-1;
-						}
+						sm=0;
 						// diffglobe++;
 					}
 					else if(diff2<diff1 && diff2<0)
 					{
-						if (diff2<besteval)
-						{
-							besteval=diff2;
-							p1b=j;
-							p2b=j+1;
-						}
-
+						a.w[s][j]=a.w[s][j+1];
+						a.w[s][j+1]=V;
+						curreval+=diff2;
 						flag=true;
+						sm=0;
 						// diffglobe++;
+					}
+					else if(diff1==0 && diffglobe>K-2)
+					{
+						a.w[s][j]=a.w[s][j-1];
+						a.w[s][j-1]=V;
+						sm++;
+						// curreval+=diff1;
+
+					}
+					else if(diff2==0 && diffglobe > K-2)
+					{
+						a.w[s][j]=a.w[s][j+1];
+						a.w[s][j+1]=V;
+						sm++;
 					}
 
 				}
@@ -166,12 +173,7 @@ searchspace findbest_forn(int don, int* val, time_t start)
 				diffglobe++;
 			}
 			else
-			{
 				diffglobe=0;
-				a.w[s][p1b]=a.w[s][p2b];
-				a.w[s][p2b]=V;
-				curreval+=besteval;
-			}
 
 
 		}
