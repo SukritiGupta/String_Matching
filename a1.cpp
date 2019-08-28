@@ -92,7 +92,7 @@ searchspace findbest_forn(int don, int* val, time_t start)
 {
 	time_t now;
 	int curreval, diff1,diff2;
-	int diffglobe=3;
+	int diffglobe=0;
 
 	// bool timeover=true;
 
@@ -103,56 +103,113 @@ searchspace findbest_forn(int don, int* val, time_t start)
 	{
 		searchspace a= searchspace(don);
 		curreval=Totaleval(a)+ CC*(don*K-totNi);
-		diffglobe=3;
-		// cout<<don<<endl;
-		// bool allowside=false;
-		while(diffglobe!=0)
+		diffglobe=5;
+		// cout<<don;
+		bool flag=false;
+		int temp=K;
+		while(diffglobe<temp)
 		{
-			diffglobe=0;
-			for (int i = 0; i < K; ++i)
+			int s= xorshf96()%K;
+			flag=false;
+			for (int j = 0; j < don; ++j)
 			{
-				for (int j = 0; j < don; ++j)
+				time(&now);
+				if(difftime(now,start)>=timeforeach)
+					break;
+				diff1=100;
+				diff2=100;
+				if(a.w[s][j]==V)
 				{
-					time(&now);
-					if(difftime(now,start)>=timeforeach)
-						break;
-					diff1=100;
-					diff2=100;
-					if(a.w[i][j]==V)
+
+					if(j>0)
 					{
-						// cout<<"here";
-						if(j>0)
-						{
-							if(a.w[i][j-1]!=V)
-								diff1=eval(a, i, j, j-1);
-						}
-						if(j<don-1)
-						{
-							if(a.w[i][j+1]!=V)
-								diff2=eval(a,i,j,j+1);
-						}
-						if(diff1<diff2 && diff1<0)
-						{
-							a.w[i][j]=a.w[i][j-1];
-							a.w[i][j-1]=V;
-							curreval+=diff1;
-							diffglobe++;
-						}
-						else if(diff2<diff1 && diff2<0)
-						{
-							a.w[i][j]=a.w[i][j+1];
-							a.w[i][j+1]=V;
-							curreval+=diff2;
-							diffglobe++;
-						}
+						if(a.w[s][j-1]!=V)
+							diff1=eval(a, s, j, j-1);
 					}
+					if(j<don-1)
+					{
+						if(a.w[s][j+1]!=V)
+							diff2=eval(a,s,j,j+1);
+					}
+					if(diff1<diff2 && diff1<0)
+					{
+						a.w[s][j]=a.w[s][j-1];
+						a.w[s][j-1]=V;
+						curreval+=diff1;
+						flag=true;
+						// diffglobe++;
+					}
+					else if(diff2<diff1 && diff2<0)
+					{
+						a.w[s][j]=a.w[s][j+1];
+						a.w[s][j+1]=V;
+						curreval+=diff2;
+						flag=true;
+						// diffglobe++;
+					}
+
 				}
 			}
-			// if (globaldiff==0)
-			// {
-			// 	allowside=true;
-			// }
+
+			if (flag==false)
+			{
+				diffglobe++;
+			}
+			else
+				diffglobe=0;
+
+
 		}
+
+		// cout<<don<<endl;
+		// bool allowside=false;
+		// while(diffglobe!=0)
+		// {
+		// 	diffglobe=0;
+		// 	for (int i = 0; i < K; ++i)
+		// 	{
+		// 		for (int j = 0; j < don; ++j)
+		// 		{
+		// 			time(&now);
+		// 			if(difftime(now,start)>=timeforeach)
+		// 				break;
+		// 			diff1=100;
+		// 			diff2=100;
+		// 			if(a.w[i][j]==V)
+		// 			{
+		// 				// cout<<"here";
+		// 				if(j>0)
+		// 				{
+		// 					if(a.w[i][j-1]!=V)
+		// 						diff1=eval(a, i, j, j-1);
+		// 				}
+		// 				if(j<don-1)
+		// 				{
+		// 					if(a.w[i][j+1]!=V)
+		// 						diff2=eval(a,i,j,j+1);
+		// 				}
+		// 				if(diff1<diff2 && diff1<0)
+		// 				{
+		// 					a.w[i][j]=a.w[i][j-1];
+		// 					a.w[i][j-1]=V;
+		// 					curreval+=diff1;
+		// 					diffglobe++;
+		// 				}
+		// 				else if(diff2<diff1 && diff2<0)
+		// 				{
+		// 					a.w[i][j]=a.w[i][j+1];
+		// 					a.w[i][j+1]=V;
+		// 					curreval+=diff2;
+		// 					diffglobe++;
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// 	// if (globaldiff==0)
+		// 	// {
+		// 	// 	allowside=true;
+		// 	// }
+		// }
 		if (opteval>curreval)
 		{
 			optassign=a;
