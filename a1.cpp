@@ -103,6 +103,8 @@ searchspace findbest_forn(int don, int* val, time_t start)
 		searchspace a= searchspace(don);
 		curreval=Totaleval(a)+ CC*(don*K-totNi);
 		diffglobe=3;
+		// cout<<don<<endl;
+		// bool allowside=false;
 		while(diffglobe!=0)
 		{
 			diffglobe=0;
@@ -128,14 +130,14 @@ searchspace findbest_forn(int don, int* val, time_t start)
 							if(a.w[i][j+1]!=V)
 								diff2=eval(a,i,j,j+1);
 						}
-						if(diff1<diff2 && diff1<0)
+						if(diff1<diff2 && diff1<=0)
 						{
 							a.w[i][j]=a.w[i][j-1];
 							a.w[i][j-1]=V;
 							curreval+=diff1;
 							diffglobe++;
 						}
-						else if(diff2<diff1 && diff2<0)
+						else if(diff2<diff1 && diff2<=0)
 						{
 							a.w[i][j]=a.w[i][j+1];
 							a.w[i][j+1]=V;
@@ -145,6 +147,10 @@ searchspace findbest_forn(int don, int* val, time_t start)
 					}
 				}
 			}
+			// if (globaldiff==0)
+			// {
+			// 	allowside=true;
+			// }
 		}
 		if (opteval>curreval)
 		{
@@ -182,13 +188,16 @@ int main()
 		cin>>c;
 		mpintochar[i]=c;
 		mpchartoint[c]=i;
-		cin>>c;		
+		if(i!=V-1)
+			cin>>c;		
 	}
 
 	mpchartoint['-']=V;
 	mpintochar[V]='-';
 
-	K=c-'0';
+	cin>>K;
+
+	cout<<"**********"<<K;
 
 	vecstr.clear();			
 	string s;
@@ -208,6 +217,7 @@ int main()
 
 
 	cin>>CC;
+	cout<<"^^^^^^^^^^^^^^^^^^^^^"<<CC;
 
 	int temp;
 
