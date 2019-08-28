@@ -137,10 +137,7 @@ searchspace findbest_forn(int don, int* val, time_t start)
 						a.w[s][j-1]=V;
 						curreval+=diff1;
 						flag=true;
-<<<<<<< HEAD
 						sm=0;
-=======
->>>>>>> 066b047b6a50f4ed4ba221c74a1baa69415c9672
 						// diffglobe++;
 					}
 					else if(diff2<diff1 && diff2<0)
