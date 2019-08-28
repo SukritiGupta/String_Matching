@@ -1,4 +1,3 @@
-	
 #include <bits/stdc++.h>
 
 static unsigned long x=123456789, y=362436069, z=521288629;
@@ -138,7 +137,10 @@ searchspace findbest_forn(int don, int* val, time_t start)
 						a.w[s][j-1]=V;
 						curreval+=diff1;
 						flag=true;
+<<<<<<< HEAD
 						sm=0;
+=======
+>>>>>>> 066b047b6a50f4ed4ba221c74a1baa69415c9672
 						// diffglobe++;
 					}
 					else if(diff2<diff1 && diff2<0)
@@ -245,32 +247,35 @@ searchspace findbest_forn(int don, int* val, time_t start)
 }
 
 
-int main()
+int main(int argc, char const *argv[])
 {
 	time_t start, procstart, end;	
 	time(&start);
 	string second;
 	float seconds;
-	getline(cin,second);
+
+	string in_file = argv[1];		fstream file1;			file1.open(in_file,ios::in);
+
+	getline(file1,second);
 	seconds=stof(second);
 	seconds*=60;
 
-	cin>>V;
+	file1>>V;
 
 	char c;
 	for (int i = 0; i < V; ++i)
 	{
-		cin>>c;
+		file1>>c;
 		mpintochar[i]=c;
 		mpchartoint[c]=i;
 		if(i!=V-1)
-			cin>>c;		
+			file1>>c;		
 	}
 
 	mpchartoint['-']=V;
 	mpintochar[V]='-';
 
-	cin>>K;
+	file1>>K;
 
 	// cout<<"**********"<<K;
 
@@ -280,7 +285,7 @@ int main()
 	int maxNi=0;			
 	for(int i=0;i<K;i++)
 	{
-		cin >> s;	
+		file1 >> s;	
 		vecstr.push_back(s);
 		l=s.length();
 		totNi+=l;
@@ -291,7 +296,7 @@ int main()
 	}
 
 
-	cin>>CC;
+	file1>>CC;
 	// cout<<"^^^^^^^^^^^^^^^^^^^^^"<<CC;
 
 	int temp;
@@ -300,13 +305,13 @@ int main()
 	{
 		for (int j = 0; j < V+1; ++j)
 		{
-			cin>>temp;
+			file1>>temp;
 			costs[i][j]=temp;			
 		}
 	}
 
 
-	cin>>c;
+	file1>>c;
 	int ll, ul;
 	vector<int> singstr;
 
@@ -380,24 +385,15 @@ int main()
 
 
 
-
-
-
-
-
-
-
-
-
-
+	fstream fl;			fl.open(argv[2],ios::out);
 
 	cout<<bestofwrite<<endl;
 	for (int i = 0; i < K; ++i)
 	{
 		for (int j = 0; j < finalwrite.w[i].size(); ++j)
 		{
-			cout<<mpintochar[finalwrite.w[i][j]];
+			fl<<mpintochar[finalwrite.w[i][j]];
 		}
-		cout<<endl;
+		fl<<endl;
 	}
 }
