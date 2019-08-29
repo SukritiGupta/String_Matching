@@ -3,25 +3,21 @@
 #include<climits>
 #include <fstream>
 
-
-// #include<iostream>//******************************
-
-
 static unsigned long x=123456789, y=362436069, z=521288629;
 
-unsigned long xorshf96(void) {          //period 2^96-1
-unsigned long t;
-    x ^= x << 16;
-    x ^= x >> 5;
-    x ^= x << 1;
+// unsigned long xorshf96(void) {          //period 2^96-1
+// unsigned long t;
+//     x ^= x << 16;
+//     x ^= x >> 5;
+//     x ^= x << 1;
 
-   t = x;
-   x = y;
-   y = z;
-   z = t ^ x ^ y;
+//    t = x;
+//    x = y;
+//    y = z;
+//    z = t ^ x ^ y;
 
-  return z;
-}
+//   return z;
+// }
 
 using namespace std;
 
@@ -56,34 +52,21 @@ class searchspace
 		{
 			siz=w[i].size();
 			del=N-siz;
-
-
-		// 		cout<<"start"<<endl;
-		// for (int kk = 0; kk < siz; ++kk)
-		// 		{
-		// 			cout<<w[i][kk];
-		// 		}
-		// 		cout<<endl<<endl;
-
+			unsigned long t;
 			nodash+=del;
-			vector<int>::iterator it=w[i].begin();
-			// cout<<i<<endl;
+			// vector<int>::iterator it=w[i].begin();
 			for (int j = 0; j < del; ++j)
 			{
-				// temp=(xorshf96()%siz);
-				// cout<<temp;
-				w[i].insert(w[i].begin()+(xorshf96()%siz),V);
+				x ^= x << 16;
+			    x ^= x >> 5;
+			    x ^= x << 1;
+				t = x;
+				x = y;
+				y = z;
+				z = t ^ x ^ y;
+				w[i].insert(w[i].begin()+(z%siz),V);
 				siz++;
-				// alldashes.push_back(make_pair(i,temp));
-
-				// for (int kk = 0; kk < siz; ++kk)
-				// {
-				// 	cout<<w[i][kk];
-				// }
-				// cout<<endl<<endl;
 			}
-			// cout<<endl;
-			// cout<<w[i];
 		}
 
 		for (int i = 0; i < K; ++i)
@@ -98,17 +81,17 @@ class searchspace
 };
 
 
-int eval(searchspace curr, int s, int p1, int p2)
-{
-	int ret=0;
-	for (int i = 0; i < K; ++i)
-	{
-		if(i==s)
-			continue;
-		ret+=costs[curr.w[i][p1]][curr.w[s][p2]]-costs[curr.w[i][p1]][curr.w[s][p1]]+costs[curr.w[i][p2]][curr.w[s][p1]]-costs[curr.w[i][p2]][curr.w[s][p2]];
-	}
-	return ret;
-}
+// int eval(searchspace curr, int s, int p1, int p2)
+// {
+// 	int ret=0;
+// 	for (int i = 0; i < K; ++i)
+// 	{
+// 		if(i==s)
+// 			continue;
+// 		ret+=costs[curr.w[i][p1]][curr.w[s][p2]]-costs[curr.w[i][p1]][curr.w[s][p1]]+costs[curr.w[i][p2]][curr.w[s][p1]]-costs[curr.w[i][p2]][curr.w[s][p2]];
+// 	}
+// 	return ret;
+// }
 
 
 int Totaleval(searchspace curr)
@@ -133,11 +116,9 @@ searchspace findbest_forn(int don, int* val, time_t start)
 	time_t now;
 	int curreval, diff1,diff2;
 	int diffglobe=0;
-
-	// bool timeover=true;
-
 	int opteval=INT_MAX;
 	searchspace optassign;
+	unsigned long t;
 
 	while(true)
 	{
@@ -145,19 +126,21 @@ searchspace findbest_forn(int don, int* val, time_t start)
 		curreval=Totaleval(a)+ CC*(don*K-totNi);
 		diffglobe=0;
 
-		// break;
-
-		// for (int i = 0; i < K; ++i)
-		// {
-		// 	printf("%s \n",a.w[i]);
-		// }
-		// cout<<don;
-		// bool flag=false;
 		int temp=a.nodash/2;
 		int s, j, pdash;
 		while(diffglobe<=temp)
 		{
-			pdash= xorshf96()%(a.nodash);
+
+			x ^= x << 16;
+		    x ^= x >> 5;
+		    x ^= x << 1;
+			t = x;
+			x = y;
+			y = z;
+			z = t ^ x ^ y;
+
+		  	//return z;
+			pdash= z%(a.nodash);
 			time(&now);
 			if(difftime(now,start)>=timeforeach)
 				break;
@@ -166,15 +149,32 @@ searchspace findbest_forn(int don, int* val, time_t start)
 			j=a.alldashes[pdash].second;
 			s=a.alldashes[pdash].first;
 
-			if(j>0)
+			if(j>0 && a.w[s][j-1]!=V)
 			{
-				if(a.w[s][j-1]!=V)
-					diff1=eval(a, s, j, j-1);
+				// diff1=eval(a, s, j, j-1);
+				diff1=0;
+
+
+				for (int ii = 0; ii < K; ++ii)
+				{
+					if(ii==s)
+						continue;
+					diff1+=costs[a.w[ii][j]][a.w[s][j-1]]-costs[a.w[ii][j]][a.w[s][j]]+costs[a.w[ii][j-1]][a.w[s][j]]-costs[a.w[ii][j-1]][a.w[s][j-1]];
+				}
 			}
-			if(j<don-1)
+			if(j<don-1 && a.w[s][j+1]!=V)
 			{
-				if(a.w[s][j+1]!=V)
-					diff2=eval(a,s,j,j+1);
+					// diff2=eval(a,s,j,j+1);
+
+				diff2=0;
+
+
+				for (int ii = 0; ii < K; ++ii)
+				{
+					if(ii==s)
+						continue;
+					diff2+=costs[a.w[ii][j]][a.w[s][j+1]]-costs[a.w[ii][j]][a.w[s][j]]+costs[a.w[ii][j+1]][a.w[s][j]]-costs[a.w[ii][j+1]][a.w[s][j+1]];
+				}
 			}
 			if(diff1<diff2 && diff1<0)
 			{
@@ -204,8 +204,6 @@ searchspace findbest_forn(int don, int* val, time_t start)
 		if(difftime(now,start)>=timeforeach)
 			break;
 	}
-
-	// cout<<endl<<don<<"  "<<opteval<<endl;
 
 	*val=opteval;
 	return optassign;
@@ -243,7 +241,6 @@ int main(int argc, char const *argv[])
 
 	file1>>K;
 
-	// cout<<"**********"<<K;
 
 	vecstr.clear();			
 	string s;
@@ -263,7 +260,6 @@ int main(int argc, char const *argv[])
 
 
 	file1>>CC;
-	// cout<<"^^^^^^^^^^^^^^^^^^^^^"<<CC;
 
 	int temp;
 
@@ -292,30 +288,11 @@ int main(int argc, char const *argv[])
 		base.push_back(singstr);
 	}
 
-
-	// searchspace finalwrites=searchspace(maxNi);
-
-	// fstream fl1;			fl1.open(argv[2],ios::out);
-
-	// // cout<<bestofwrite<<endl;
-	// for (int i = 0; i < K; ++i)
-	// {
-	// 	for (int j = 0; j < finalwrites.w[i].size(); ++j)
-	// 	{
-	// 		fl1<<mpintochar[finalwrites.w[i][j]];
-	// 	}
-	// 	fl1<<endl;
-	// }
-
-	// exit(0);
-
-
-
 	ll=maxNi;
 	ul=(maxNi+totNi)/2;
 	bool separate=false;
 	int jump=1;
-	int rounds=(ul-ll)/7; //****************what if this is 0????????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	int rounds=(ul-ll)/7; 
 
 	if (rounds==0)
 	{
@@ -334,7 +311,7 @@ int main(int argc, char const *argv[])
 		time(&procstart);
 		double timeleft=difftime(start, procstart);
 		timeleft+=seconds;
-		double buffer=2+0.1*K; //*****************************
+		double buffer=2+0.1*K;
 		timeleft-=buffer>3?buffer:3;
 		// timeleft-=5;
 
@@ -357,7 +334,6 @@ int main(int argc, char const *argv[])
 			}
 			else donerounds++;
 	
-			// time(&now); //****************************************88change to start + something
 			now=(double)now+timeforeach;
 			b=findbest_forn(i, &val, now);
 			if(val<bestofwrite)
@@ -368,7 +344,6 @@ int main(int argc, char const *argv[])
 	
 			doner++;
 	
-			// cout<<i<<"   "<<val<<endl;
 		}
 	}
 	else
@@ -390,7 +365,6 @@ int main(int argc, char const *argv[])
 
 		for (int i = maxNi+1; i <= ul; i++)
 		{
-			// time(&now); //****************************************88change to start + something
 			now=(double)now+timeforeach;
 			b=findbest_forn(i, &val, now);
 			if(val<bestofwrite)
@@ -407,7 +381,6 @@ int main(int argc, char const *argv[])
 
 	fstream fl;			fl.open(argv[2],ios::out);
 
-	// cout<<bestofwrite<<endl;
 	for (int i = 0; i < K; ++i)
 	{
 		for (int j = 0; j < finalwrite.w[i].size(); ++j)
