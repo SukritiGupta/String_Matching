@@ -2,6 +2,11 @@
 #include<unordered_map>
 #include<climits>
 #include <fstream>
+
+
+// #include<iostream>//******************************
+
+
 static unsigned long x=123456789, y=362436069, z=521288629;
 
 unsigned long xorshf96(void) {          //period 2^96-1
@@ -34,24 +39,59 @@ double timeforeach;
 class searchspace
 {
 	public:
-	int N;
+	int N, nodash;
 	vector<vector<int>> w;
+	vector<pair<int, int>> alldashes;
 	searchspace(){};
 	searchspace(int n)	
 	{
 		N=n;
 		w=base;
-
+		int temp;
+		nodash=0;
+		alldashes.clear();
 		int del, siz;
+
 		for (int i = 0; i < K ; ++i)
 		{
 			siz=w[i].size();
 			del=N-siz;
+
+
+		// 		cout<<"start"<<endl;
+		// for (int kk = 0; kk < siz; ++kk)
+		// 		{
+		// 			cout<<w[i][kk];
+		// 		}
+		// 		cout<<endl<<endl;
+
+			nodash+=del;
 			vector<int>::iterator it=w[i].begin();
+			// cout<<i<<endl;
 			for (int j = 0; j < del; ++j)
 			{
+				// temp=(xorshf96()%siz);
+				// cout<<temp;
 				w[i].insert(w[i].begin()+(xorshf96()%siz),V);
 				siz++;
+				// alldashes.push_back(make_pair(i,temp));
+
+				// for (int kk = 0; kk < siz; ++kk)
+				// {
+				// 	cout<<w[i][kk];
+				// }
+				// cout<<endl<<endl;
+			}
+			// cout<<endl;
+			// cout<<w[i];
+		}
+
+		for (int i = 0; i < K; ++i)
+		{
+			for (int j = 0; j < N; ++j)
+			{
+				if(w[i][j]==V)
+					alldashes.push_back(make_pair(i,j));
 			}
 		}
 	}
@@ -65,8 +105,7 @@ int eval(searchspace curr, int s, int p1, int p2)
 	{
 		if(i==s)
 			continue;
-		ret+=costs[curr.w[i][p1]][curr.w[s][p2]]-costs[curr.w[i][p1]][curr.w[s][p1]];
-		ret+=costs[curr.w[i][p2]][curr.w[s][p1]]-costs[curr.w[i][p2]][curr.w[s][p2]];
+		ret+=costs[curr.w[i][p1]][curr.w[s][p2]]-costs[curr.w[i][p1]][curr.w[s][p1]]+costs[curr.w[i][p2]][curr.w[s][p1]]-costs[curr.w[i][p2]][curr.w[s][p2]];
 	}
 	return ret;
 }
@@ -104,113 +143,58 @@ searchspace findbest_forn(int don, int* val, time_t start)
 	{
 		searchspace a= searchspace(don);
 		curreval=Totaleval(a)+ CC*(don*K-totNi);
-		diffglobe=5;
+		diffglobe=0;
+
+		// break;
+
+		// for (int i = 0; i < K; ++i)
+		// {
+		// 	printf("%s \n",a.w[i]);
+		// }
 		// cout<<don;
-		bool flag=false;
-		int temp=K;
-		while(diffglobe<temp)
+		// bool flag=false;
+		int temp=a.nodash/2;
+		int s, j, pdash;
+		while(diffglobe<=temp)
 		{
-			int s= xorshf96()%K;
-			flag=false;
-			for (int j = 0; j < don; ++j)
+			pdash= xorshf96()%(a.nodash);
+			time(&now);
+			if(difftime(now,start)>=timeforeach)
+				break;
+			diff1=1;
+			diff2=1;
+			j=a.alldashes[pdash].second;
+			s=a.alldashes[pdash].first;
+
+			if(j>0)
 			{
-				time(&now);
-				if(difftime(now,start)>=timeforeach)
-					break;
-				diff1=100;
-				diff2=100;
-				if(a.w[s][j]==V)
-				{
-
-					if(j>0)
-					{
-						if(a.w[s][j-1]!=V)
-							diff1=eval(a, s, j, j-1);
-					}
-					if(j<don-1)
-					{
-						if(a.w[s][j+1]!=V)
-							diff2=eval(a,s,j,j+1);
-					}
-					if(diff1<diff2 && diff1<0)
-					{
-						a.w[s][j]=a.w[s][j-1];
-						a.w[s][j-1]=V;
-						curreval+=diff1;
-						flag=true;
-						// diffglobe++;
-					}
-					else if(diff2<diff1 && diff2<0)
-					{
-						a.w[s][j]=a.w[s][j+1];
-						a.w[s][j+1]=V;
-						curreval+=diff2;
-						flag=true;
-						// diffglobe++;
-					}
-
-				}
+				if(a.w[s][j-1]!=V)
+					diff1=eval(a, s, j, j-1);
 			}
-
-			if (flag==false)
+			if(j<don-1)
 			{
-				diffglobe++;
+				if(a.w[s][j+1]!=V)
+					diff2=eval(a,s,j,j+1);
+			}
+			if(diff1<diff2 && diff1<0)
+			{
+				a.w[s][j]=a.w[s][j-1];
+				a.w[s][j-1]=V;
+				curreval+=diff1;
+				a.alldashes[pdash].second=j-1;
+				diffglobe=0;
+			}
+			else if(diff2<diff1 && diff2<0)
+			{
+				a.w[s][j]=a.w[s][j+1];
+				a.w[s][j+1]=V;
+				curreval+=diff2;
+				diffglobe=0;
+				a.alldashes[pdash].second=j+1;
 			}
 			else
-				diffglobe=0;
-
-
+				diffglobe++;
 		}
-
-		// cout<<don<<endl;
-		// bool allowside=false;
-		// while(diffglobe!=0)
-		// {
-		// 	diffglobe=0;
-		// 	for (int i = 0; i < K; ++i)
-		// 	{
-		// 		for (int j = 0; j < don; ++j)
-		// 		{
-		// 			time(&now);
-		// 			if(difftime(now,start)>=timeforeach)
-		// 				break;
-		// 			diff1=100;
-		// 			diff2=100;
-		// 			if(a.w[i][j]==V)
-		// 			{
-		// 				// cout<<"here";
-		// 				if(j>0)
-		// 				{
-		// 					if(a.w[i][j-1]!=V)
-		// 						diff1=eval(a, i, j, j-1);
-		// 				}
-		// 				if(j<don-1)
-		// 				{
-		// 					if(a.w[i][j+1]!=V)
-		// 						diff2=eval(a,i,j,j+1);
-		// 				}
-		// 				if(diff1<diff2 && diff1<0)
-		// 				{
-		// 					a.w[i][j]=a.w[i][j-1];
-		// 					a.w[i][j-1]=V;
-		// 					curreval+=diff1;
-		// 					diffglobe++;
-		// 				}
-		// 				else if(diff2<diff1 && diff2<0)
-		// 				{
-		// 					a.w[i][j]=a.w[i][j+1];
-		// 					a.w[i][j+1]=V;
-		// 					curreval+=diff2;
-		// 					diffglobe++;
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// 	// if (globaldiff==0)
-		// 	// {
-		// 	// 	allowside=true;
-		// 	// }
-		// }
 		if (opteval>curreval)
 		{
 			optassign=a;
@@ -309,6 +293,21 @@ int main(int argc, char const *argv[])
 	}
 
 
+	// searchspace finalwrites=searchspace(maxNi);
+
+	// fstream fl1;			fl1.open(argv[2],ios::out);
+
+	// // cout<<bestofwrite<<endl;
+	// for (int i = 0; i < K; ++i)
+	// {
+	// 	for (int j = 0; j < finalwrites.w[i].size(); ++j)
+	// 	{
+	// 		fl1<<mpintochar[finalwrites.w[i][j]];
+	// 	}
+	// 	fl1<<endl;
+	// }
+
+	// exit(0);
 
 
 
