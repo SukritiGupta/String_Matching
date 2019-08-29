@@ -1,5 +1,7 @@
-#include <bits/stdc++.h>
-
+#include<vector>
+#include<unordered_map>
+#include<climits>
+#include <fstream>
 static unsigned long x=123456789, y=362436069, z=521288629;
 
 unsigned long xorshf96(void) {          //period 2^96-1
@@ -103,11 +105,10 @@ searchspace findbest_forn(int don, int* val, time_t start)
 		searchspace a= searchspace(don);
 		curreval=Totaleval(a)+ CC*(don*K-totNi);
 		diffglobe=5;
-		// cout<<don<<endl;
+		// cout<<don;
 		bool flag=false;
 		int temp=K;
-		int sm=0;
-		while(diffglobe<temp && sm<5)
+		while(diffglobe<temp)
 		{
 			int s= xorshf96()%K;
 			flag=false;
@@ -137,7 +138,6 @@ searchspace findbest_forn(int don, int* val, time_t start)
 						a.w[s][j-1]=V;
 						curreval+=diff1;
 						flag=true;
-						sm=0;
 						// diffglobe++;
 					}
 					else if(diff2<diff1 && diff2<0)
@@ -146,22 +146,7 @@ searchspace findbest_forn(int don, int* val, time_t start)
 						a.w[s][j+1]=V;
 						curreval+=diff2;
 						flag=true;
-						sm=0;
 						// diffglobe++;
-					}
-					else if(diff1==0 && diffglobe>K-2)
-					{
-						a.w[s][j]=a.w[s][j-1];
-						a.w[s][j-1]=V;
-						sm++;
-						// curreval+=diff1;
-
-					}
-					else if(diff2==0 && diffglobe > K-2)
-					{
-						a.w[s][j]=a.w[s][j+1];
-						a.w[s][j+1]=V;
-						sm++;
 					}
 
 				}
@@ -236,7 +221,7 @@ searchspace findbest_forn(int don, int* val, time_t start)
 			break;
 	}
 
-	cout<<endl<<don<<"  "<<opteval<<endl;
+	// cout<<endl<<don<<"  "<<opteval<<endl;
 
 	*val=opteval;
 	return optassign;
@@ -329,53 +314,92 @@ int main(int argc, char const *argv[])
 
 	ll=maxNi;
 	ul=(maxNi+totNi)/2;
-
+	bool separate=false;
 	int jump=1;
 	int rounds=(ul-ll)/7; //****************what if this is 0????????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	int diffntried=1+rounds*3; //use for time division of each n
-	time(&procstart);
-	double timeleft=difftime(start, procstart);
-	timeleft+=seconds;
-	timeleft-=5;
 
-	timeforeach=timeleft/diffntried;
-
-
-	int val;
-	time_t now;
-	time(&now);
-	searchspace finalwrite=findbest_forn(maxNi, &val, now);
-	int bestofwrite=val;
-	int donerounds=1;
-	searchspace b;
-
-	int doner=1;
-
-	for (int i = maxNi+1; i <= ul; i+=jump)
+	if (rounds==0)
 	{
-		// if(doner>=diffntried)
-		// {
-		// 	cout<<"check!!!!";
-		// 	break;
-		// }
-		if(donerounds==rounds)
+		ul=totNi;
+		rounds=(ul-ll)/7;
+	}
+	if (rounds==0)
+	{
+		separate=true;
+	}
+	searchspace finalwrite;
+
+	if(!separate)
+	{
+		int diffntried=1+rounds*3; //use for time division of each n
+		time(&procstart);
+		double timeleft=difftime(start, procstart);
+		timeleft+=seconds;
+		double buffer=2+0.1*K; //*****************************
+		timeleft-=buffer>3?buffer:3;
+		// timeleft-=5;
+
+		timeforeach=timeleft/diffntried;
+		int val;
+		time_t now=procstart;
+		// time(&now);
+		finalwrite=findbest_forn(maxNi, &val, now);
+		int bestofwrite=val;
+		int donerounds=1;
+		searchspace b;
+
+		int doner=1;
+		for (int i = maxNi+1; i <= ul; i+=jump)
 		{
-			donerounds=1;
-			jump*=2;
+			if(donerounds==rounds)
+			{
+				donerounds=1;
+				jump*=2;
+			}
+			else donerounds++;
+	
+			// time(&now); //****************************************88change to start + something
+			now=(double)now+timeforeach;
+			b=findbest_forn(i, &val, now);
+			if(val<bestofwrite)
+			{
+				bestofwrite=val;
+				finalwrite=b;
+			}
+	
+			doner++;
+	
+			// cout<<i<<"   "<<val<<endl;
 		}
-		else donerounds++;
+	}
+	else
+	{
+		int diffntried=1+ul-ll; //use for time division of each n
+		time(&procstart);
+		double timeleft=difftime(start, procstart);
+		timeleft+=seconds;
+		double buffer=2+0.1*K; 
+		timeleft-=buffer>3?buffer:3;
 
-		time(&now); //****************************************88change to start + something
-		b=findbest_forn(i, &val, now);
-		if(val<bestofwrite)
+		timeforeach=timeleft/diffntried;
+		int val;
+		time_t now=procstart;
+		// time(&now);
+		finalwrite=findbest_forn(maxNi, &val, now);
+		int bestofwrite=val;
+		searchspace b;
+
+		for (int i = maxNi+1; i <= ul; i++)
 		{
-			bestofwrite=val;
-			finalwrite=b;
+			// time(&now); //****************************************88change to start + something
+			now=(double)now+timeforeach;
+			b=findbest_forn(i, &val, now);
+			if(val<bestofwrite)
+			{
+				bestofwrite=val;
+				finalwrite=b;
+			}
 		}
-
-		doner++;
-
-		// cout<<i<<"   "<<val<<endl;
 	}
 
 
@@ -384,7 +408,7 @@ int main(int argc, char const *argv[])
 
 	fstream fl;			fl.open(argv[2],ios::out);
 
-	cout<<bestofwrite<<endl;
+	// cout<<bestofwrite<<endl;
 	for (int i = 0; i < K; ++i)
 	{
 		for (int j = 0; j < finalwrite.w[i].size(); ++j)
