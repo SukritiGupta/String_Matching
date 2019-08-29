@@ -149,33 +149,40 @@ searchspace findbest_forn(int don, int* val, time_t start)
 			j=a.alldashes[pdash].second;
 			s=a.alldashes[pdash].first;
 
-			if(j>0 && a.w[s][j-1]!=V)
+			if(j>0 && a.w[s][j-1]!=V && j<don-1 && a.w[s][j+1]!=V)
 			{
 				// diff1=eval(a, s, j, j-1);
 				diff1=0;
-
-
+				diff2=0;
 				for (int ii = 0; ii < K; ++ii)
 				{
-					if(ii==s)
-						continue;
 					diff1+=costs[a.w[ii][j]][a.w[s][j-1]]-costs[a.w[ii][j]][a.w[s][j]]+costs[a.w[ii][j-1]][a.w[s][j]]-costs[a.w[ii][j-1]][a.w[s][j-1]];
+					diff2+=costs[a.w[ii][j]][a.w[s][j+1]]-costs[a.w[ii][j]][a.w[s][j]]+costs[a.w[ii][j+1]][a.w[s][j]]-costs[a.w[ii][j+1]][a.w[s][j+1]];
+				
 				}
 			}
-			if(j<don-1 && a.w[s][j+1]!=V)
+			else if(j<don-1 && a.w[s][j+1]!=V)
 			{
 					// diff2=eval(a,s,j,j+1);
-
+				diff1=10;
 				diff2=0;
-
-
 				for (int ii = 0; ii < K; ++ii)
 				{
-					if(ii==s)
-						continue;
 					diff2+=costs[a.w[ii][j]][a.w[s][j+1]]-costs[a.w[ii][j]][a.w[s][j]]+costs[a.w[ii][j+1]][a.w[s][j]]-costs[a.w[ii][j+1]][a.w[s][j+1]];
 				}
 			}
+
+			else if(j>0 && a.w[s][j-1]!=V)
+			{
+					// diff2=eval(a,s,j,j+1);
+				diff1=0;
+				diff2=10;
+				for (int ii = 0; ii < K; ++ii)
+				{
+					diff1+=costs[a.w[ii][j]][a.w[s][j-1]]-costs[a.w[ii][j]][a.w[s][j]]+costs[a.w[ii][j-1]][a.w[s][j]]-costs[a.w[ii][j-1]][a.w[s][j-1]];
+				}
+			}
+
 			if(diff1<diff2 && diff1<0)
 			{
 				a.w[s][j]=a.w[s][j-1];
